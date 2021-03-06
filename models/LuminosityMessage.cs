@@ -1,8 +1,8 @@
-﻿using Microsoft.WindowsAzure.Storage.Table;
+using Microsoft.WindowsAzure.Storage.Table;
 
 namespace AF_1cosmosdb.models
 {
-    class LuminosityMessage : TableEntity
+    class LuminosityMessage : TableEntity, ISortable
     {
         public string ID { get; set; }
         public double luminosity { get; set; }
