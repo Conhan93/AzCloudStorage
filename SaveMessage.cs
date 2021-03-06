@@ -17,7 +17,7 @@ namespace AF_1cosmosdb
     {
         private static HttpClient client = new HttpClient();
 
-        [FunctionName("SaveMessageCosmosDB")]
+        [FunctionName("SaveMessage")]
         [return: Table("Messages")]
         public static DynamicTableEntity Run(
             [IoTHubTrigger("messages/events", Connection = "IotHubConnection", ConsumerGroup = "$Default")] EventData message,
