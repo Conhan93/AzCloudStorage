@@ -32,8 +32,8 @@ namespace AF_1cosmosdb
         {
             // for table storage
             var ent = new DynamicTableEntity();
-    
-            
+
+
             switch (message.Properties["type"])
             {
                 case "dht":
@@ -68,7 +68,7 @@ namespace AF_1cosmosdb
                     log.LogInformation("unknown type");
                     break;
             }
-        
+
 
 
             cosmos = Encoding.UTF8.GetString(message.Body.Array);
