@@ -20,13 +20,13 @@ namespace AF_1cosmosdb
             [Table("Messages")] CloudTable cloudtable,
             ILogger log)
         {
-
+            // check http request key
             if (req.Query.ContainsKey("lum"))
             {
                 IEnumerable<LuminosityMessage> results = await cloudtable
                  .ExecuteQuerySegmentedAsync(new TableQuery<LuminosityMessage>(), null);
 
-
+                // query table
                 results = results.Where(ts => ts.PartitionKey == "luminosity");
                 results = results.OrderByDescending(ts => ts.messageCreated);
                 results = results.Take(10);

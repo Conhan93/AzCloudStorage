@@ -30,10 +30,10 @@ namespace AF_1cosmosdb
             ILogger log
         )
         {
-            // for table storage
+            // table storage returntype
             var ent = new DynamicTableEntity();
 
-
+            // format message into table storage format depending on sensor type
             switch (message.Properties["type"])
             {
                 case "dht":
@@ -70,11 +70,11 @@ namespace AF_1cosmosdb
             }
 
 
-
+            // save message to CosmosDB
             cosmos = Encoding.UTF8.GetString(message.Body.Array);
             log.LogInformation($"message processed: {Encoding.UTF8.GetString(message.Body.Array)}");
 
-            // for table storage
+            // save message to table storage
             return ent;
         }
     }
