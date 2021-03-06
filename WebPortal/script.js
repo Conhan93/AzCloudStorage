@@ -10,13 +10,16 @@ let storageButton = document.getElementById('storage');
 
 let headers = document.getElementById('header');
 
+// button objects
 dhtButton.addEventListener('click',getDHT);
 voltButton.addEventListener('click',getVolt);
 lumButton.addEventListener('click',getLum);
 storageButton.addEventListener('click',changeStorage);
 
+// really important
 var FunctionAppName = "ENTER YOUR FUNCTION APP NAME";
 
+// changes which storage solution to request data from
 function changeStorage()
 {
     if(storageButton.innerHTML == 'cosmos')
@@ -24,8 +27,10 @@ function changeStorage()
     else
         storageButton.innerHTML = 'cosmos';
 }
+// gets and displays DHT data
 function getDHT()
 {
+    // create headers
     headers.innerHTML = `
     <tr>
     <th scope="col">Device ID</th>
@@ -33,21 +38,23 @@ function getDHT()
     <th scope="col">Humidity</th>
     <th scope="col">Timestamp</th>
     </tr>`;
-
+    // clear table
     tabledata.innerHTML = "";
+
     if(storageButton.innerHTML == 'cosmos')
     {
         fetch(`https://${FunctionAppName}.azurewebsites.net/api/GetFromCosmos?humidity`)
         .then(response => response.json())
         .then(data => {
-            console.log(data)
+            // create table
             for(let row of data)
             {
-            tabledata.innerHTML += `<tr>
-                                    <td>${row.ID}</td>
-                                    <td>${row.temperature.toFixed(2)}</td>
-                                    <td>${row.humidity.toFixed(2)}</td>
-                                    <td>${toIso(row.messageCreated)}</td>`
+              // add row
+              tabledata.innerHTML += `<tr>
+                                      <td>${row.ID}</td>
+                                      <td>${row.temperature.toFixed(2)}</td>
+                                      <td>${row.humidity.toFixed(2)}</td>
+                                      <td>${toIso(row.messageCreated)}</td>`
             }
         })
     }
@@ -56,7 +63,7 @@ function getDHT()
         )
         .then(response => response.json())
         .then(data => {
-            console.log(data);
+
             for(let row of data)
             {
             tabledata.innerHTML += `<tr>
@@ -67,23 +74,27 @@ function getDHT()
             }
         })
 }
+// gets and displays volt type data
 function getVolt()
 {
-
+    // create header row
     headers.innerHTML = `
     <tr>
     <th scope="col">Device ID</th>
     <th scope="col">Volt</th>
     <th scope="col">Timestamp</th>
     </tr>`;
+    // clear table
     tabledata.innerHTML = "";
+
     if(storageButton.innerHTML == 'cosmos')
         fetch(`https://${FunctionAppName}.azurewebsites.net/api/GetFromCosmos?volt`).
         then(response => response.json())
             .then(data => {
-            console.log(data)
+            // creates table
             for(let row of data)
             {
+                // create row
                 tabledata.innerHTML += `<tr>
                                         <td>${row.ID}</td>
                                         <td>${row.Volt.toFixed(2)}</td>
@@ -94,7 +105,7 @@ function getVolt()
         fetch(`https://${FunctionAppName}.azurewebsites.net/api/GetTable?volt`).
         then(response => response.json())
             .then(data => {
-            console.log(data)
+
             for(let row of data)
             {
                 tabledata.innerHTML += `<tr>
@@ -104,22 +115,27 @@ function getVolt()
             }
         })
 }
+// gets and displays luminosity type data
 function getLum()
 {
+    // creates header row
     headers.innerHTML = `
     <tr>
     <th scope="col">Device ID</th>
     <th scope="col">Luminosity</th>
     <th scope="col">Timestamp</th>
     </tr>`;
+    // clears previous data
     tabledata.innerHTML = "";
+
     if(storageButton.innerHTML == 'cosmos')
         fetch(`https://${FunctionAppName}.azurewebsites.net/api/GetFromCosmos?luminosity`).
         then(response => response.json())
             .then(data => {
-            console.log(data)
+
             for(let row of data)
             {
+                // add new row
                 tabledata.innerHTML += `<tr>
                 <td>${row.ID}</td>
                 <td>${row.luminosity.toFixed(2)}%</td>
@@ -130,7 +146,7 @@ function getLum()
         fetch(`https://${FunctionAppName}.azurewebsites.net/api/GetTable?lum`).
         then(response => response.json())
             .then(data => {
-            console.log(data)
+
             for(let row of data)
             {
                 tabledata.innerHTML += `<tr>
@@ -140,6 +156,7 @@ function getLum()
             }
         })
 }
+// converts unix timestamp to readable string format
 function toIso(timestamp)
 {
     var datetime = new Date(timestamp * 1000);
