@@ -28,14 +28,12 @@ namespace AF_1cosmosdb
             string[] types = { "humidity", "Volt", "luminosity" };
             string condition = "";
 
+            // check for keys
             foreach (var type in types)
                 if (req.Query.ContainsKey(type))
                     condition = type;
 
-
-
-
-
+            // create and execute documentquery
             IEnumerable<dynamic> query = cosmosdb.CreateDocumentQuery<dynamic>(collectionUri, "SELECT TOP 10 * " +
                 " FROM c" +
                 $" WHERE  c.{condition} >= 0" +
