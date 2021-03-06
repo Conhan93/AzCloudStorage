@@ -36,20 +36,14 @@ namespace AF_1cosmosdb
             {
                 case "luminosity":
                     results = await GetItemsAsync<LuminosityMessage>(cloudtable, type);
-                    results = results.OrderByDescending(ts => ts.messageCreated);
-                    results = results.Take(10);
 
                     break;
                 case "volt":
                     results = await GetItemsAsync<VoltMessage>(cloudtable, type);
-                    results = results.OrderByDescending(ts => ts.messageCreated);
-                    results = results.Take(10);
 
                     break;
                 case "dht":
                     results = await GetItemsAsync<DhtMessage>(cloudtable, type);
-                    results = results.OrderByDescending(ts => ts.messageCreated);
-                    results = results.Take(10);
 
                     break;
                 default:
@@ -64,13 +58,15 @@ namespace AF_1cosmosdb
         }
         // gets items by partitionkey, returns enumerable
         private static async Task<IEnumerable<T>> GetItemsAsync<T>(CloudTable cloudtable, string type)
-        where T : ITableEntity, new()
+        where T : ITableEntity, ISortable, new()
         {
             IEnumerable<T> results = await cloudtable
                  .ExecuteQuerySegmentedAsync(new TableQuery<T>(), null);
 
 
             results = results.Where(ts => ts.PartitionKey == type);
+            results = results.OrderByDescending(ts => ts.messageCreated);
+            results = results.Take(10);
 
             return results;
         }
