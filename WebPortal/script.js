@@ -18,6 +18,8 @@ storageButton.addEventListener('click',changeStorage);
 
 // really important
 var FunctionAppName = "ENTER YOUR FUNCTION APP NAME";
+// 
+// 
 
 // changes which storage solution to request data from
 function changeStorage()
@@ -143,7 +145,7 @@ function getLum()
             }
         })
     else
-        fetch(`https://${FunctionAppName}.azurewebsites.net/api/GetTable?lum`).
+        fetch(`https://${FunctionAppName}.azurewebsites.net/api/GetTable?luminosity`).
         then(response => response.json())
             .then(data => {
 

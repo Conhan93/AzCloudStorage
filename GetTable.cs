@@ -20,50 +20,59 @@ namespace AF_1cosmosdb
             [Table("Messages")] CloudTable cloudtable,
             ILogger log)
         {
-            // check http request key
-            if (req.Query.ContainsKey("lum"))
+            // sensor types
+            string[] types = { "dht", "volt", "luminosity" };
+            string type = "";
+
+            // check query keys
+            foreach (var _type in types)
+                if (req.Query.ContainsKey(_type))
+                    type = _type;
+
+            // return collection
+            IEnumerable<dynamic> results;
+
+            switch(type)
             {
-                IEnumerable<LuminosityMessage> results = await cloudtable
-                 .ExecuteQuerySegmentedAsync(new TableQuery<LuminosityMessage>(), null);
+                case "luminosity":
+                    results = await GetItemsAsync<LuminosityMessage>(cloudtable, type);
+                    results = results.OrderByDescending(ts => ts.messageCreated);
+                    results = results.Take(10);
 
-                // query table
-                results = results.Where(ts => ts.PartitionKey == "luminosity");
-                results = results.OrderByDescending(ts => ts.messageCreated);
-                results = results.Take(10);
+                    break;
+                case "volt":
+                    results = await GetItemsAsync<VoltMessage>(cloudtable, type);
+                    results = results.OrderByDescending(ts => ts.messageCreated);
+                    results = results.Take(10);
 
-                return results != null ?
-                    (ActionResult)new OkObjectResult(results) :
-                    new BadRequestObjectResult("[]");
-            }
-            else if(req.Query.ContainsKey("dht"))
-            {
-                IEnumerable<DhtMessage> results = await cloudtable
-                 .ExecuteQuerySegmentedAsync(new TableQuery<DhtMessage>(), null);
+                    break;
+                case "dht":
+                    results = await GetItemsAsync<DhtMessage>(cloudtable, type);
+                    results = results.OrderByDescending(ts => ts.messageCreated);
+                    results = results.Take(10);
 
-                results = results.Where(ts => ts.PartitionKey == "dht");
-                results = results.OrderByDescending(ts => ts.messageCreated);
-                results = results.Take(10);
-
-                return results != null ?
-                    (ActionResult)new OkObjectResult(results) :
-                    new BadRequestObjectResult("[]");
-            }
-            else if(req.Query.ContainsKey("volt"))
-            {
-                IEnumerable<VoltMessage> results = await cloudtable
-                 .ExecuteQuerySegmentedAsync(new TableQuery<VoltMessage>(), null);
-
-                results = results.Where(ts => ts.PartitionKey == "volt");
-                results = results.OrderByDescending(ts => ts.messageCreated);
-                results = results.Take(10);
-
-                return results != null ?
-                    (ActionResult)new OkObjectResult(results) :
-                    new BadRequestObjectResult("[]");
+                    break;
+                default:
+                    results = null;
+                    break;
             }
 
-            return new BadRequestObjectResult("[]");
+            return results != null ?
+                        (ActionResult)new OkObjectResult(results) :
+                        new BadRequestObjectResult("[]");
 
+        }
+        // gets items by partitionkey, returns enumerable
+        private static async Task<IEnumerable<T>> GetItemsAsync<T>(CloudTable cloudtable, string type)
+        where T : ITableEntity, new()
+        {
+            IEnumerable<T> results = await cloudtable
+                 .ExecuteQuerySegmentedAsync(new TableQuery<T>(), null);
+
+
+            results = results.Where(ts => ts.PartitionKey == type);
+
+            return results;
         }
     }
 }
